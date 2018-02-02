@@ -95,7 +95,7 @@ public abstract class Unit {
 	}
 	
 	public boolean isCollide(Unit other) {
-		return false;
+		return this.getNode().getBoundsInParent().intersects(other.getNode().getBoundsInParent());
 	}
 	
 	private int getTranslateXFromCoordinateX() {
