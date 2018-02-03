@@ -1,5 +1,5 @@
 package com.chanhonlun.splash.model;
 
-public class Rubbish extends Character {
+public class Enemy extends Character {
 
 }

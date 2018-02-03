@@ -1,5 +1,5 @@
 package com.chanhonlun.splash.model;
 
-public class Splash {
+public class Weapon {
 
 }
