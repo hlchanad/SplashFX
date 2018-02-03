@@ -9,6 +9,7 @@ import com.chanhonlun.splash.application.Game;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -74,6 +75,10 @@ public abstract class Unit {
 	public void setXY(int x, int y) {
 		this.x = x; 
 		this.y = y;
+		if (node != null) {
+			node.setTranslateX(getTranslateXFromCoordinateX());
+			node.setTranslateY(getTranslateYFromCoordinateY());
+		}
 	}
 	
 	protected Node generateNode() {
@@ -88,8 +93,10 @@ public abstract class Unit {
 		
 		// fall back case when don't have an image
 		if (node == null) {
-			Color[] colors = new Color[] {Color.ALICEBLUE, Color.AQUAMARINE, Color.BLANCHEDALMOND, Color.DARKGREY};
-			Color color = colors[(int) Math.floor(Math.random() * colors.length)];
+			int r = (int) Math.floor(Math.random() * 255),
+				g = (int) Math.floor(Math.random() * 255),
+				b = (int) Math.floor(Math.random() * 255);
+			Color color = Color.rgb(r, g, b);
 			node = new Rectangle(width, height, color);
 		}
 		
@@ -114,7 +121,7 @@ public abstract class Unit {
 	public int getWidth()  { return width; }
 	public int getHeight() { return height; }
 	
-	private int getTranslateXFromCoordinateX() {
+	protected int getTranslateXFromCoordinateX() {
 		if (alignment == Alignment.CENTER) {
 			return x - Game.PANE_WIDTH / 2;			
 		} else if (alignment == Alignment.BOTTOM_LEFT){
@@ -123,12 +130,15 @@ public abstract class Unit {
 		return x;
 	}
 	
-	private int getTranslateYFromCoordinateY() {
+	protected int getTranslateYFromCoordinateY() {
 		if (alignment == Alignment.CENTER) {
 			return (y - Game.PANE_HEIGHT / 2) * -1;			
 		} else if (alignment == Alignment.BOTTOM_LEFT){
 			return (y - Game.PANE_HEIGHT / 2 + height / 2) * -1;
 		}
 		return y;
+	}
+
+	public void handleKeyPressed(KeyEvent event) {
 	}
 }
