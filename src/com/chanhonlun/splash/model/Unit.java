@@ -49,6 +49,8 @@ public abstract class Unit {
 	
 	protected Alignment alignment;
 	
+	protected Node node;
+	
 	public Unit() {
 		this.image = new File(DEFAULT_IMAGE);
 		this.x = DEFAULT_X;
@@ -56,6 +58,7 @@ public abstract class Unit {
 		this.width     = DEFAULT_WIDTH;
 		this.height    = DEFAULT_HEIGHT;
 		this.alignment = DEFAULT_ALIGN;
+		this.node = null;
 	}
 	
 	public Unit(File image, int x, int y, int width, int height) {
@@ -65,6 +68,7 @@ public abstract class Unit {
 		this.width     = width;
 		this.height    = height;
 		this.alignment = DEFAULT_ALIGN;
+		this.node = null;
 	}
 	
 	public void setXY(int x, int y) {
@@ -72,19 +76,21 @@ public abstract class Unit {
 		this.y = y;
 	}
 	
-	public Node getNode() {
+	protected Node generateNode() {
 		Node node = null;
 		try {
 			node = new ImageView(new Image(new FileInputStream(this.image)));
 			((ImageView) node).setFitWidth(width);
 			((ImageView) node).setFitHeight(height);
 		} catch (FileNotFoundException e) {
-			System.err.println("getNode() FileNotFoundException, replaced with a dummy purple square");
+			System.err.println("generateNode(): FileNotFoundException, replaced with a dummy square");
 		}
 		
 		// fall back case when don't have an image
 		if (node == null) {
-			node = new Rectangle(width, height, Color.BLUEVIOLET);
+			Color[] colors = new Color[] {Color.ALICEBLUE, Color.AQUAMARINE, Color.BLANCHEDALMOND, Color.DARKGREY};
+			Color color = colors[(int) Math.floor(Math.random() * colors.length)];
+			node = new Rectangle(width, height, color);
 		}
 		
 		// node = Rectangle/ ImageView
@@ -94,9 +100,19 @@ public abstract class Unit {
 		return node;
 	}
 	
+	public Node getNode() {
+		if (node == null) {
+			node = generateNode();
+		}
+		return node;
+	}
+	
 	public boolean isCollide(Unit other) {
 		return this.getNode().getBoundsInParent().intersects(other.getNode().getBoundsInParent());
 	}
+	
+	public int getWidth()  { return width; }
+	public int getHeight() { return height; }
 	
 	private int getTranslateXFromCoordinateX() {
 		if (alignment == Alignment.CENTER) {
