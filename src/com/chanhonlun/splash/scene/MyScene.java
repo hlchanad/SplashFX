@@ -14,13 +14,16 @@ public abstract class MyScene {
 	
 	public MyScene() {
 		this.emitterMap = new HashMap<String, EventEmitter<Object>>();
-//		this.scene = this.createScene();
+		this.scene = null;
 	}
 
-	public abstract Scene createScene();
+	protected abstract Scene createScene();
 	
 	public Scene getScene() {
-		return this.createScene();
+		if (scene == null) {
+			scene = createScene();
+		}
+		return scene;
 	}
 	
 	public EventEmitter<Object> getEventEmitter(String key) {

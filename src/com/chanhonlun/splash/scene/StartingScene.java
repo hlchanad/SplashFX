@@ -29,7 +29,7 @@ public class StartingScene extends MyScene {
 	}
 	
 	@Override
-	public Scene createScene() {
+	protected Scene createScene() {
 
 		BorderPane root = new BorderPane();
 		root.setBackground(new Background(new BackgroundFill(Color.rgb(16, 90, 209), CornerRadii.EMPTY, Insets.EMPTY)));

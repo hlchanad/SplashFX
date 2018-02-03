@@ -34,7 +34,7 @@ public class LeaderboardScene extends MyScene {
 	}
 	
 	@Override
-	public Scene createScene() {
+	protected Scene createScene() {
 		
 		/*
 		 * setup title text
