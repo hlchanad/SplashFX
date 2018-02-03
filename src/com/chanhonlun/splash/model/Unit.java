@@ -139,6 +139,9 @@ public abstract class Unit {
 		return y;
 	}
 
-	public void handleKeyPressed(KeyEvent event) {
+	public void handleKeyPressed(KeyEvent keyEvent) {
+	}
+	
+	public void handleKeyReleased(KeyEvent keyEvent) {
 	}
 }
