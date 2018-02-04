@@ -5,6 +5,7 @@ import java.io.File;
 import com.chanhonlun.splash.application.Game;
 
 import javafx.animation.Animation;
+import javafx.animation.Animation.Status;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.Node;
@@ -23,12 +24,10 @@ public class Player extends Character {
 	private static final int MOVE_VERTICAL_MAX     = 200;
 	
 	// animations
-	private boolean jumping;
 	private Timeline leftSlider, rightSlider, jumper, diver;
 	
 	public Player() {
 		this.image = new File(PLAYER_IMAGE);
-		this.jumping = false;
 		
 		setupSlideAnimation();
 		setupJumpAnimation();
@@ -68,7 +67,6 @@ public class Player extends Character {
 		diver.setCycleCount(MOVE_VERTICAL_MAX / MOVE_VERTICAL_PIXEL);
 		
 		jumper.setOnFinished(jumperActionEvent -> diver.play());
-		diver.setOnFinished(diverActionEvent -> jumping = false);
 	}
 	
 	@Override
@@ -81,17 +79,16 @@ public class Player extends Character {
 	public void handleKeyPressed(KeyEvent keyEvent) {
 		super.handleKeyPressed(keyEvent);
 		
-		if (jumping) {
+		if (jumper.getStatus().equals(Status.RUNNING) || diver.getStatus().equals(Status.RUNNING)) {
 			// can move left/ right ONLY when jumping 
-			if (keyEvent.getCode() == KeyCode.LEFT) {
+			if (keyEvent.getCode().equals(KeyCode.LEFT)) {
 				leftSlider.play();
-			} else if (keyEvent.getCode() == KeyCode.RIGHT) {
+			} else if (keyEvent.getCode().equals(KeyCode.RIGHT)) {
 				rightSlider.play();
 			} 
 		}
 		else {
-			if (keyEvent.getCode() == KeyCode.SPACE) {
-				jumping = true;
+			if (keyEvent.getCode().equals(KeyCode.SPACE)) {
 				jumper.play();
 			}
 		}
@@ -101,9 +98,9 @@ public class Player extends Character {
 	public void handleKeyReleased(KeyEvent keyEvent) {
 		super.handleKeyReleased(keyEvent);
 
-		if (keyEvent.getCode() == KeyCode.LEFT) {
+		if (keyEvent.getCode().equals(KeyCode.LEFT)) {
 			leftSlider.stop();
-		} else if (keyEvent.getCode() == KeyCode.RIGHT) {
+		} else if (keyEvent.getCode().equals(KeyCode.RIGHT)) {
 			rightSlider.stop();
 		}
 	}
