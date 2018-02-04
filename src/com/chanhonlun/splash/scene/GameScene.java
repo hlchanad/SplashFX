@@ -5,19 +5,25 @@ import java.util.List;
 
 import com.chanhonlun.splash.application.Game;
 import com.chanhonlun.splash.model.Enemy;
+import com.chanhonlun.splash.model.NormalPlatform;
+import com.chanhonlun.splash.model.Platform;
 import com.chanhonlun.splash.model.Player;
-import com.chanhonlun.splash.model.Unit;
 
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 
 public class GameScene extends MyScene {
 
-	private static final int PLAYER_GROUND_Y   = 50;
-	public static final int ENEMY_AREA_PART    = 3; // top 1/3 height will be the enemy zone
-	public static final int ENEMY_MAX_NUMBER   = 5;
+	private static final int PLAYER_GROUND_Y     = 50;
+	private static final int ENEMY_AREA_PART     = 3; // top 1/3 height will be the enemy zone
+	private static final int ENEMY_MAX_NUMBER    = 5;
+	private static final int PLATFORM_MAX_NUMBER = 5;
+	private static final int PLATFORM_SCREEN_PADDING_TOP    = 100;
+	private static final int PLATFORM_SCREEN_PADDING_BOTTOM = 50;
 	
 	private List<Enemy> enemies;
+	private Player player;
+	private List<Platform> platforms;
 	
 	public GameScene() {
 		this.enemies = new LinkedList<Enemy>();
@@ -28,9 +34,16 @@ public class GameScene extends MyScene {
 		
 		StackPane root = new StackPane();
 		
-		Unit player = generatePlayer(root);
+		player = generatePlayer();
+		root.getChildren().add(player.getNode());
 		
-		generateEnemy(root);
+		enemies = generateEnemies();
+		enemies.forEach(enemy -> root.getChildren().add(enemy.getNode()));
+		
+		platforms = generatePlatforms();
+		platforms.forEach(platform -> root.getChildren().add(platform.getNode()));
+
+		player.getNode().toFront(); // needs to be invoked every time something is added to the pane
 		
 		Scene scene = new Scene(root, Game.PANE_WIDTH, Game.PANE_HEIGHT);
 
@@ -39,8 +52,8 @@ public class GameScene extends MyScene {
 		
 		return scene;
 	}
-	
-	private Unit generatePlayer(StackPane stackPane) {
+
+	private Player generatePlayer() {
 		Player player = new Player();
 		
 		int x = (Game.PANE_WIDTH - player.getWidth()) / 2;
@@ -48,12 +61,12 @@ public class GameScene extends MyScene {
 		
 		player.setXY(x, y);
 		
-		stackPane.getChildren().add(player.getNode());
-		
 		return player;
 	}
 	
-	private void generateEnemy(StackPane stackPane) {
+	private List<Enemy> generateEnemies() {
+		
+		List<Enemy> enemies = new LinkedList<Enemy>();
 		
 		for (int i = 0; i < ENEMY_MAX_NUMBER; i++) {
 			Enemy enemy = new Enemy();
@@ -63,8 +76,27 @@ public class GameScene extends MyScene {
 			
 			enemy.setXY(x, y);
 			
-			this.enemies.add(enemy);
-			stackPane.getChildren().add(enemy.getNode());
+			enemies.add(enemy);
 		}
+		
+		return enemies;
+	}
+	
+	private List<Platform> generatePlatforms() {
+		
+		List<Platform> platforms = new LinkedList<Platform>();
+		
+		for (int i = 0; i < PLATFORM_MAX_NUMBER; i++) {
+			Platform platform = new NormalPlatform();
+			
+			int x = (int) (Math.floor(Math.random() * (Game.PANE_WIDTH - platform.getWidth())));
+			int y = (int) (Math.floor(Math.random() * (Game.PANE_HEIGHT - PLATFORM_SCREEN_PADDING_TOP - PLATFORM_SCREEN_PADDING_BOTTOM - platform.getHeight())) + PLATFORM_SCREEN_PADDING_BOTTOM);
+			
+			platform.setXY(x, y);
+			
+			platforms.add(platform);
+		}
+		
+		return platforms;
 	}
 }
