@@ -8,6 +8,7 @@ import com.chanhonlun.splash.model.Enemy;
 import com.chanhonlun.splash.model.NormalPlatform;
 import com.chanhonlun.splash.model.Platform;
 import com.chanhonlun.splash.model.Player;
+import com.chanhonlun.splash.util.EventEmitter;
 
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
@@ -22,12 +23,15 @@ public class GameScene extends MyScene {
 	private static final int PLATFORM_SCREEN_PADDING_TOP             = 100;
 	private static final int PLATFORM_SCREEN_PADDING_BOTTOM          = 100;
 	
+	public static final String ON_LOSE = "onLose";
+	
 	private List<Enemy> enemies;
 	private Player player;
 	private List<Platform> platforms;
 	
 	public GameScene() {
 		this.enemies = new LinkedList<Enemy>();
+		this.emitterMap.put(ON_LOSE, new EventEmitter<Object>());
 	}
 	
 	@Override

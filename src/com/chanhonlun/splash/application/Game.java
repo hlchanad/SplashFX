@@ -1,5 +1,6 @@
 package com.chanhonlun.splash.application;
 
+import com.chanhonlun.splash.scene.EndGameScene;
 import com.chanhonlun.splash.scene.GameScene;
 import com.chanhonlun.splash.scene.LeaderboardScene;
 import com.chanhonlun.splash.scene.MyScene;
@@ -25,6 +26,7 @@ public class Game extends Application {
 		MyScene startingScene    = new StartingScene();
 		MyScene leaderboardScene = new LeaderboardScene();
 		MyScene gameScene        = new GameScene();
+		MyScene endGameScene     = new EndGameScene();
 		
 		/*
 		 * setup condition for changing scene
@@ -37,6 +39,12 @@ public class Game extends Application {
 		
 		leaderboardScene.getEventEmitter(LeaderboardScene.ON_CLICKED_BACK_BUTTON)
 			.subscribe(event -> primaryStage.setScene(startingScene.getScene()));
+		
+		gameScene.getEventEmitter(GameScene.ON_LOSE)
+			.subscribe(score -> {
+				((EndGameScene) endGameScene).setScore((int) score);
+				primaryStage.setScene(endGameScene.getScene());
+			});
 		
 		/*
 		 * setup primary stage
