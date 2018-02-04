@@ -78,7 +78,6 @@ public class LeaderboardScene extends MyScene {
 		root.setBottom(backButtonPane);
 		
 		Scene scene = new Scene(root, Game.PANE_WIDTH, Game.PANE_HEIGHT);
-		scene.setOnMousePressed(event -> System.out.println("clicked screen" + event));
 
 		return scene;
 	}

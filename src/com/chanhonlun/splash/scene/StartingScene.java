@@ -19,7 +19,7 @@ import javafx.scene.text.TextAlignment;
 
 public class StartingScene extends MyScene {
 	
-	public static final String ON_CLICK_START_BUTTON = "onClickStartButton";
+	public static final String ON_CLICK_START_BUTTON       = "onClickStartButton";
 	public static final String ON_CLICK_LEADERBOARD_BUTTON = "onClickLeaderboardButton";
 	
 	public StartingScene() {
@@ -75,7 +75,6 @@ public class StartingScene extends MyScene {
 		root.setCenter(pane);
 		
 		Scene scene = new Scene(root, Game.PANE_WIDTH, Game.PANE_HEIGHT);
-		scene.setOnMousePressed(event -> System.out.println("clicked screen" + event));
 		
 		return scene;
 	}
