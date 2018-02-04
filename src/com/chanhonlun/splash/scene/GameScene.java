@@ -14,12 +14,13 @@ import javafx.scene.layout.StackPane;
 
 public class GameScene extends MyScene {
 
-	private static final int PLAYER_GROUND_Y     = 50;
-	private static final int ENEMY_AREA_PART     = 3; // top 1/3 height will be the enemy zone
-	private static final int ENEMY_MAX_NUMBER    = 5;
-	private static final int PLATFORM_MAX_NUMBER = 5;
-	private static final int PLATFORM_SCREEN_PADDING_TOP    = 100;
-	private static final int PLATFORM_SCREEN_PADDING_BOTTOM = 50;
+	private static final int PLAYER_GROUND_Y                         = 20;
+	private static final int ENEMY_AREA_PART                         = 3; // top 1/3 height will be the enemy zone
+	private static final int ENEMY_MAX_NUMBER                        = 5;
+	private static final int PLATFORM_PART_NUMBER                    = 3;
+    private static final int PLATFORM_NUMBER_PER_PART                = 2;
+	private static final int PLATFORM_SCREEN_PADDING_TOP             = 100;
+	private static final int PLATFORM_SCREEN_PADDING_BOTTOM          = 100;
 	
 	private List<Enemy> enemies;
 	private Player player;
@@ -82,19 +83,27 @@ public class GameScene extends MyScene {
 		return enemies;
 	}
 	
+	private Platform generatePlatform(int part) {
+		Platform platform = new NormalPlatform();
+		
+		int pixelsPerPart = (Game.PANE_HEIGHT - PLATFORM_SCREEN_PADDING_TOP - PLATFORM_SCREEN_PADDING_BOTTOM) / PLATFORM_PART_NUMBER;
+		
+		int x = (int) (Math.floor(Math.random() * (Game.PANE_WIDTH - platform.getWidth())));
+		int y = (int) (Math.floor(Math.random() * (pixelsPerPart - platform.getHeight())) + pixelsPerPart * part + PLATFORM_SCREEN_PADDING_BOTTOM);
+		
+		platform.setXY(x, y);
+		
+		return platform;
+	}
+	
 	private List<Platform> generatePlatforms() {
 		
 		List<Platform> platforms = new LinkedList<Platform>();
 		
-		for (int i = 0; i < PLATFORM_MAX_NUMBER; i++) {
-			Platform platform = new NormalPlatform();
-			
-			int x = (int) (Math.floor(Math.random() * (Game.PANE_WIDTH - platform.getWidth())));
-			int y = (int) (Math.floor(Math.random() * (Game.PANE_HEIGHT - PLATFORM_SCREEN_PADDING_TOP - PLATFORM_SCREEN_PADDING_BOTTOM - platform.getHeight())) + PLATFORM_SCREEN_PADDING_BOTTOM);
-			
-			platform.setXY(x, y);
-			
-			platforms.add(platform);
+		for (int i = 0; i < PLATFORM_PART_NUMBER; i++) {
+			for (int j = 0; j < PLATFORM_NUMBER_PER_PART; j++) {
+				platforms.add(generatePlatform(i));
+			}
 		}
 		
 		return platforms;
