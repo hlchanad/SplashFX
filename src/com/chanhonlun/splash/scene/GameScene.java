@@ -10,6 +10,7 @@ import com.chanhonlun.splash.model.Platform;
 import com.chanhonlun.splash.model.Player;
 import com.chanhonlun.splash.util.EventEmitter;
 
+import javafx.geometry.Point2D;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
 
@@ -40,6 +41,7 @@ public class GameScene extends MyScene {
 		StackPane root = new StackPane();
 		
 		player = generatePlayer();
+		player.getFallDownEmitter().subscribe(point -> handlePlayerFallDown(point));
 		root.getChildren().add(player.getNode());
 		
 		enemies = generateEnemies();
@@ -58,6 +60,29 @@ public class GameScene extends MyScene {
 		return scene;
 	}
 
+	private void handlePlayerFallDown(Point2D point) {
+		System.out.printf("Player coordinate: (%s, %s)\n", point.getX(), point.getY());
+		
+		if (player.fallBelowGround()) {
+			// TODO: emit real score later
+			player.stopJumping();
+			this.emitterMap.get(ON_LOSE).emit(5000);
+			return ;
+		}
+		
+		for (Platform platform : platforms) {
+			if (player.onPlatform(platform)) {
+				player.setXY(player.getXY().getX(), platform.getXY().getY() + platform.getHeight());
+				player.stopJumping();
+				
+				
+				// TODO: move platforms down (smoothly)
+				
+				break;
+			}
+		}
+	}
+	
 	private Player generatePlayer() {
 		Player player = new Player();
 		

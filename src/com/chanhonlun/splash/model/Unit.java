@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 
 import com.chanhonlun.splash.application.Game;
 
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -44,7 +45,7 @@ public abstract class Unit {
 	 *  --+------------------------->
 	 *  O |                         x
 	 */
-	protected int x, y;
+	protected double x, y;
 	
 	protected int width, height;
 	
@@ -72,7 +73,7 @@ public abstract class Unit {
 		this.node = null;
 	}
 	
-	public void setXY(int x, int y) {
+	public void setXY(double x, double y) {
 		this.x = x; 
 		this.y = y;
 		if (node != null) {
@@ -118,10 +119,11 @@ public abstract class Unit {
 		return this.getNode().getBoundsInParent().intersects(other.getNode().getBoundsInParent());
 	}
 	
+	public Point2D getXY() { return new Point2D(x, y); }
 	public int getWidth()  { return width; }
 	public int getHeight() { return height; }
 	
-	protected int getTranslateXFromCoordinateX() {
+	protected double getTranslateXFromCoordinateX() {
 		if (alignment == Alignment.CENTER) {
 			return x - Game.PANE_WIDTH / 2;			
 		} else if (alignment == Alignment.BOTTOM_LEFT){
@@ -130,7 +132,7 @@ public abstract class Unit {
 		return x;
 	}
 	
-	protected int getTranslateYFromCoordinateY() {
+	protected double getTranslateYFromCoordinateY() {
 		if (alignment == Alignment.CENTER) {
 			return (y - Game.PANE_HEIGHT / 2) * -1;			
 		} else if (alignment == Alignment.BOTTOM_LEFT){
