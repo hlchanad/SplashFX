@@ -30,6 +30,8 @@ public class GameScene extends MyScene {
 	private Player player;
 	private List<Platform> platforms;
 	
+	private boolean isJumpedFirstTime = false;
+	
 	public GameScene() {
 		this.enemies = new LinkedList<Enemy>();
 		this.emitterMap.put(ON_LOSE, new EventEmitter<Object>());
@@ -41,7 +43,9 @@ public class GameScene extends MyScene {
 		StackPane root = new StackPane();
 		
 		player = generatePlayer();
-		player.getFallDownEmitter().subscribe(point -> handlePlayerFallDown(point));
+		player.getEmitter(Player.EVENT_MOVE_UP).subscribe(point -> isJumpedFirstTime = true);
+		player.getEmitter(Player.EVENT_MOVE_DOWN).subscribe(point -> handlePlayerMoveDown(point));
+		player.getEmitter(Player.EVENT_MOVE_HORIZONTALLY).subscribe(point -> handlePlayerMoveHorizontally(point));
 		root.getChildren().add(player.getNode());
 		
 		enemies = generateEnemies();
@@ -60,12 +64,12 @@ public class GameScene extends MyScene {
 		return scene;
 	}
 
-	private void handlePlayerFallDown(Point2D point) {
-		System.out.printf("Player coordinate: (%s, %s)\n", point.getX(), point.getY());
+	private void handlePlayerMoveDown(Point2D point) {
+		System.out.printf("Player move down: coordinate: (%s, %s)\n", point.getX(), point.getY());
 		
 		if (player.fallBelowGround()) {
 			// TODO: emit real score later
-			player.stopJumping();
+			player.stopFalling();
 			this.emitterMap.get(ON_LOSE).emit(5000);
 			return ;
 		}
@@ -73,13 +77,35 @@ public class GameScene extends MyScene {
 		for (Platform platform : platforms) {
 			if (player.onPlatform(platform)) {
 				player.setXY(player.getXY().getX(), platform.getXY().getY() + platform.getHeight());
-				player.stopJumping();
+				player.stopFalling();
 				
 				
 				// TODO: move platforms down (smoothly)
 				
 				break;
 			}
+		}
+	}
+	
+	private void handlePlayerMoveHorizontally(Point2D point) {
+		System.out.printf("Player mvoe horizontally: coordinate: (%s, %s)\n", point.getX(), point.getY());
+		
+		// do nothing before first jump
+		if (!isJumpedFirstTime) {
+			return ;
+		}
+		
+		boolean isOnPlatform = false;
+		
+		for (Platform platform : platforms) {
+			if (player.onPlatform(platform)) {
+				isOnPlatform = true;
+				break;
+			}
+		}
+		
+		if (!isOnPlatform) {
+			player.fall();
 		}
 	}
 	
