@@ -76,10 +76,11 @@ public abstract class Unit {
 	public void setXY(double x, double y) {
 		this.x = x; 
 		this.y = y;
-		if (node != null) {
-			node.setTranslateX(getTranslateXFromCoordinateX());
-			node.setTranslateY(getTranslateYFromCoordinateY());
-		}
+		
+		this.node = getNode();
+		
+		node.setTranslateX(getTranslateXFromCoordinateX());
+		node.setTranslateY(getTranslateYFromCoordinateY());
 	}
 	
 	protected Node generateNode() {

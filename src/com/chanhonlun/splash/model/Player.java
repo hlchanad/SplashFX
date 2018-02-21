@@ -175,4 +175,12 @@ public class Player extends Character {
 		}
 		
 	}
+
+	
+	public void stopMotion() {
+		jumper.stop();
+		faller.stop();
+		leftSlider.stop();
+		rightSlider.stop();
+	}
 }
