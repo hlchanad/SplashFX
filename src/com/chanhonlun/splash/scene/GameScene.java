@@ -12,13 +12,12 @@ import com.chanhonlun.splash.model.Text;
 import com.chanhonlun.splash.util.EventEmitter;
 
 import javafx.animation.Animation;
+import javafx.animation.Animation.Status;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.animation.Animation.Status;
 import javafx.geometry.Point2D;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
-import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 
 public class GameScene extends MyScene {
@@ -26,21 +25,21 @@ public class GameScene extends MyScene {
 	private static final int PLAYER_GROUND_Y                         = 20;
 	private static final int ENEMY_AREA_PART                         = 3; // top 1/3 height will be the enemy zone
 	private static final int ENEMY_MAX_NUMBER                        = 5;
-	private static final int PLATFORM_PART_NUMBER                    = 3;
-    private static final int PLATFORM_NUMBER_PER_PART                = 2;
-	private static final int PLATFORM_SCREEN_PADDING_TOP             = 100;
-	private static final int PLATFORM_SCREEN_PADDING_BOTTOM          = 100;
+	
+	private static final int PLATFORM_MAX_NUMBER                     = 10;
+	private static final double PLATFORM_MAX_Y_DIFF                  = 150;
+	private static final double PLATFORM_MIN_Y_DIFF                  = 30;
 	
 	private static final int    ANIMATION_KEY_FRAMES_MILLIS         = 30;
 	private static final double MOVE_VERTICAL_PIXEL                 = 5;
-	private static final double PLAYER_PLATFORM_BOTTOM_AREA_Y       = 20;
+	public  static final double PLAYER_PLATFORM_BOTTOM_AREA_Y       = 20;
 	
 	private static final int SCORE_PER_PLATFORM_BELOW_SCREEN        = 10;
-	private static final int SCORE_PER_KILLING_ENEMY                = 100;
+//	private static final int SCORE_PER_KILLING_ENEMY                = 100;
 	
 	public static final String ON_LOSE = "onLose";
 	
-	private List<Enemy> enemies;
+//	private List<Enemy> enemies;
 	private Player player;
 	private List<Platform> platforms;
 	
@@ -70,8 +69,8 @@ public class GameScene extends MyScene {
 		player.getEmitter(Player.EVENT_MOVE_HORIZONTALLY).subscribe(point -> handlePlayerMoveHorizontally(point));
 		root.getChildren().add(player.getNode());
 		
-		enemies = generateEnemies();
-		enemies.forEach(enemy -> root.getChildren().add(enemy.getNode()));
+//		enemies = generateEnemies();
+//		enemies.forEach(enemy -> root.getChildren().add(enemy.getNode()));
 		
 		platforms = generatePlatforms();
 		platforms.forEach(platform -> root.getChildren().add(platform.getNode()));
@@ -129,7 +128,7 @@ public class GameScene extends MyScene {
 						   newY = platform.getXY().getY() - MOVE_VERTICAL_PIXEL;
 					platform.setXY(newX, newY);
 					
-					if (newY + platform.getHeight() < 0) { 
+					if (platform.isBelowScreen()) { 
 						// pending to remove platform 
 						platformsToBeRemoved.add(platform);
 					}
@@ -147,7 +146,7 @@ public class GameScene extends MyScene {
 					   newY = player.getXY().getY() - MOVE_VERTICAL_PIXEL;
 				player.setXY(newX, newY);
 				
-				if (playerPlatform.getXY().getY() <= PLAYER_PLATFORM_BOTTOM_AREA_Y) {
+				if (playerPlatform.isInBottom()) {
 					moveEverythingDown.stop();
 				}
 			}
@@ -164,8 +163,7 @@ public class GameScene extends MyScene {
 	private void handlePlayerMoveDown(Point2D point) {
 		
 		if (player.fallBelowGround()) {
-			// TODO: emit real score later
-			player.stopFalling();
+			player.stopMotion();
 			this.emitterMap.get(ON_LOSE).emit(score);
 			return ;
 		}
@@ -179,11 +177,10 @@ public class GameScene extends MyScene {
 			}
 		}
 		
-		if (playerPlatform != null && playerPlatform.getXY().getY() > PLAYER_PLATFORM_BOTTOM_AREA_Y) {
+		if (playerPlatform != null && !playerPlatform.isInBottom()) {
 			int numberOfPlatformsToBeRemoved = 0;
-			double moveDownPixel = playerPlatform.getXY().getY() - PLAYER_PLATFORM_BOTTOM_AREA_Y;
 			for (Platform platform : platforms) {
-				if (platform.getXY().getY() - moveDownPixel < 0) {
+				if (platform.getXY().getY() + platform.getHeight() - playerPlatform.diffWithBottom() < 0) {
 					numberOfPlatformsToBeRemoved ++;
 				}
 			}
@@ -248,39 +245,45 @@ public class GameScene extends MyScene {
 		return enemies;
 	}
 	
-	private Platform generatePlatform(int part) {
+	private Platform generatePlatform(double highestY) {
+		
 		Platform platform = new NormalPlatform();
 		
-		int pixelsPerPart = (Game.PANE_HEIGHT - PLATFORM_SCREEN_PADDING_TOP - PLATFORM_SCREEN_PADDING_BOTTOM) / PLATFORM_PART_NUMBER;
-		
-		int x = (int) (Math.floor(Math.random() * (Game.PANE_WIDTH - platform.getWidth())));
-		int y = (int) (Math.floor(Math.random() * (pixelsPerPart - platform.getHeight())) + pixelsPerPart * part + PLATFORM_SCREEN_PADDING_BOTTOM);
+		double x = Math.floor(Math.random() * (Game.PANE_WIDTH - platform.getWidth()));
+		double y = Math.random() * (PLATFORM_MAX_Y_DIFF - PLATFORM_MIN_Y_DIFF) + PLATFORM_MIN_Y_DIFF + highestY;
 		
 		platform.setXY(x, y);
 		
 		return platform;
 	}
 	
+	private void respawnPlatform() {
+		
+		double highestY = platforms.get(platforms.size() - 1).getXY().getY();
+		
+		Platform platform = generatePlatform(highestY);
+		platforms.add(platform);
+		
+		root.getChildren().add(platform.getNode());
+		setSomeNodesOnTop();
+	}
+	
 	private List<Platform> generatePlatforms() {
 		
 		List<Platform> platforms = new LinkedList<Platform>();
 		
-		for (int i = 0; i < PLATFORM_PART_NUMBER; i++) {
-			for (int j = 0; j < PLATFORM_NUMBER_PER_PART; j++) {
-				platforms.add(generatePlatform(i));
-			}
+		double highestY = player.getXY().getY();
+		
+		while (platforms.size() < PLATFORM_MAX_NUMBER && highestY < Game.PANE_HEIGHT) {
+			Platform platform = generatePlatform(highestY);
+			platforms.add(platform);
+			
+			highestY = platform.getXY().getY();
 		}
 		
 		return platforms;
 	}
 	
-	private void respawnPlatform() {
-		Platform platform = generatePlatform(PLATFORM_PART_NUMBER); 
-		platforms.add(platform);
-		root.getChildren().add(platform.getNode());
-		setSomeNodesOnTop();
-	}
-
 	private void setSomeNodesOnTop() {
 		player.getNode().toFront();
 		scoreText.getNode().toFront();
