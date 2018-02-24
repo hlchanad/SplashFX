@@ -16,6 +16,8 @@ public class Game extends Application {
 	public static final int PANE_WIDTH  = 450;
 	public static final int PANE_HEIGHT = 600;
 	
+	private MyScene startingScene, leaderboardScene, gameScene, endGameScene;
+	
 	public static void main(String[] args) {
 		Game.launch(args);
 	}
@@ -23,11 +25,25 @@ public class Game extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		
-		MyScene startingScene    = new StartingScene();
-		MyScene leaderboardScene = new LeaderboardScene();
-		MyScene gameScene        = new GameScene();
-		MyScene endGameScene     = new EndGameScene();
+		initScene();
+		setupEventHandler(primaryStage);
 		
+		/*
+		 * setup primary stage
+		 */
+		primaryStage.setTitle(APP_NAME);
+		primaryStage.setScene(startingScene.getScene());
+		primaryStage.show();	
+	}
+	
+	private void initScene() {
+		startingScene    = new StartingScene();
+		leaderboardScene = new LeaderboardScene();
+		gameScene        = new GameScene();
+		endGameScene     = new EndGameScene();
+	}
+
+	private void setupEventHandler(Stage primaryStage) {
 		/*
 		 * setup condition for changing scene
 		 */
@@ -46,11 +62,13 @@ public class Game extends Application {
 				primaryStage.setScene(endGameScene.getScene());
 			});
 		
-		/*
-		 * setup primary stage
-		 */
-		primaryStage.setTitle(APP_NAME);
-		primaryStage.setScene(startingScene.getScene());
-		primaryStage.show();	
+		endGameScene.getEventEmitter(EndGameScene.ON_CLICK_REPLAY_BUTTON)
+			.subscribe(event -> {
+				primaryStage.setScene(startingScene.getScene());
+				
+				// recreate scene instance and subscribe again
+				initScene();
+				setupEventHandler(primaryStage);
+			});
 	}
 }
