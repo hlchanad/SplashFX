@@ -58,7 +58,7 @@ public class StartingScene extends MyScene {
 		leaderBoardButton.setText("Leaderboard");
 		leaderBoardButton.setLayoutY(50);
 		leaderBoardButton.setMinHeight(30);
-		leaderBoardButton.setOnMouseClicked(event -> emitterMap.get(ON_CLICK_LEADERBOARD_BUTTON).emit(event));
+//		leaderBoardButton.setOnMouseClicked(event -> emitterMap.get(ON_CLICK_LEADERBOARD_BUTTON).emit(event));
 		
 		/*
 		 * add all object into pane
@@ -66,7 +66,7 @@ public class StartingScene extends MyScene {
 		VBox pane = new VBox();
 		pane.getChildren().add(title);
 		pane.getChildren().add(startButton);
-		pane.getChildren().add(leaderBoardButton);
+//		pane.getChildren().add(leaderBoardButton);
 		pane.setAlignment(Pos.CENTER);
 		VBox.setMargin(title, new Insets(0, 0, 200, 0));
 		VBox.setMargin(startButton, new Insets(10));
